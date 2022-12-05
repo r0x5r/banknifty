@@ -1,0 +1,237 @@
+//@version=4
+study("CPR", shorttitle="CPR", overlay=true)
+
+getSeries(e, timeFrame) => security(syminfo.tickerid, timeFrame, e, lookahead=barmerge.lookahead_on)
+
+//Previous day datas
+PrevDayClose = getSeries(close[1], 'D')
+PrevDayOpen = getSeries(open[1], 'D')
+PrevDayHigh = getSeries(high[1], 'D')
+PrevDayLow = getSeries(low[1], 'D')
+
+//Day CPR levels
+DayPivotLevel = (PrevDayHigh + PrevDayLow + PrevDayClose) / 3
+DayBCPRlevel = (PrevDayHigh + PrevDayLow) / 2
+DayTCPRlevel = (DayPivotLevel - DayBCPRlevel) + DayPivotLevel
+DayR1level = (2 * DayPivotLevel) - PrevDayLow
+DayS1level = (2 * DayPivotLevel) - PrevDayHigh
+DayR2level = DayPivotLevel + (PrevDayHigh - PrevDayLow)
+DayS2level = DayPivotLevel - (PrevDayHigh - PrevDayLow)
+DayR3level = PrevDayHigh + 2 * (DayPivotLevel - PrevDayLow)
+DayS3level = PrevDayLow - 2 * (PrevDayHigh - DayPivotLevel)
+DayR4level = DayR3level + (DayR2level - DayR1level)
+DayS4level = DayS3level - (DayS1level - DayS2level)
+
+//UX Input Arguments
+DayPP = #ffffff
+DayBC = #0000FF
+DayTC = #0000FF
+DayR1 = #b71c1c
+DayS1 = #67c52e
+DayR2 = #b71c1c
+DayS2 = #67c52e
+DayR3 = #b71c1c
+DayS3 = #67c52e
+DayR4 = #b71c1c
+DayS4 = #67c52e
+PrevDHigh = #ffeb3b
+PrevDLow = #ffeb3b
+//PrevDClose = color.gray
+
+myWidthMainLevels = input(title="Line width for pivots", type=input.integer, defval=1, minval=1)
+DayPivot = input(true, title="Show Daily Pivot")
+DaySR = input(true, title="Show Daily Support/Resistance")
+DayCPR = input(true, title="Show Daily CPR Range")
+PrevDayH = input(true, title="Show Previous Day High")
+PrevDayL = input(true, title="Show Previous Day Low")
+//PrevDayCL = input(true, title="Show Previous Day Close")
+
+plot(DayPivot and DayPivotLevel and timeframe.isintraday ? DayPivotLevel : na, title="DayPP", color=DayPP, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(DayCPR and DayBCPRlevel and timeframe.isintraday ? DayBCPRlevel : na, title="DayBC", color=DayBC, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(DayCPR and DayTCPRlevel and timeframe.isintraday ? DayTCPRlevel : na, title="DayTC", color=DayTC, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(DaySR and DayR1level and timeframe.isintraday ? DayR1level : na, title="DayR1", color=DayR1, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(DaySR and DayS1level and timeframe.isintraday ? DayS1level : na, title="DayS1", color=DayS1, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(DaySR and DayR2level and timeframe.isintraday ? DayR2level : na, title="DayR2", color=DayR2, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(DaySR and DayS2level and timeframe.isintraday ? DayS2level : na, title="DayS2", color=DayS2, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(DaySR and DayR3level and timeframe.isintraday ? DayR3level : na, title="DayR3", color=DayR3, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(DaySR and DayS3level and timeframe.isintraday ? DayS3level : na, title="DayS3", color=DayS3, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(DaySR and DayR4level and timeframe.isintraday ? DayR4level : na, title="DayR4", color=DayR4, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(DaySR and DayS4level and timeframe.isintraday ? DayS4level : na, title="DayS4", color=DayS4, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(PrevDayH and PrevDayHigh and timeframe.isintraday ? PrevDayHigh : na, title="PrevDayHigh", color=PrevDHigh, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(PrevDayL and PrevDayLow and timeframe.isintraday ? PrevDayLow : na, title="PrevDayLow", color=PrevDLow, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+//plot(PrevDayCL and PrevDayClose and timeframe.isintraday ? PrevDayClose : na, title="PrevDayClose", color=PrevDClose, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+
+//Previous Week datas
+PrevWeekClose = getSeries(close[1], 'W')
+PrevWeekOpen = getSeries(open[1], 'W')
+PrevWeekHigh = getSeries(high[1], 'W')
+PrevWeekLow = getSeries(low[1], 'W')
+
+//Week CPR levels
+WeekPivotLevel = (PrevWeekHigh + PrevWeekLow + PrevWeekClose) / 3
+WeekBCPRlevel = (PrevWeekHigh + PrevWeekLow) / 2
+WeekTCPRlevel = (WeekPivotLevel - WeekBCPRlevel) + WeekPivotLevel
+WeekR1level = (2 * WeekPivotLevel) - PrevWeekLow
+WeekS1level = (2 * WeekPivotLevel) - PrevWeekHigh
+WeekR2level = WeekPivotLevel + (PrevWeekHigh - PrevWeekLow)
+WeekS2level = WeekPivotLevel - (PrevWeekHigh - PrevWeekLow)
+WeekR3level = PrevWeekHigh + 2 * (WeekPivotLevel - PrevWeekLow)
+WeekS3level = PrevWeekLow - 2 * (PrevWeekHigh - WeekPivotLevel)
+WeekR4level = WeekR3level + (WeekR2level - WeekR1level)
+WeekS4level = WeekS3level - (WeekS1level - WeekS2level)
+
+//UX Input Arguments
+WeekPP = #ffffff
+WeekBC = #0000FF
+WeekTC = #0000FF
+WeekR1 = #00bcd4
+WeekS1 = #00bcd4
+WeekR2 = #00bcd4
+WeekS2 = #00bcd4
+WeekR3 = #00bcd4
+WeekS3 = #00bcd4
+WeekR4 = #00bcd4
+WeekS4 = #00bcd4
+PrevWHigh = #ffeb3b
+PrevWLow = #ffeb3b
+
+WeekPivot = input(true, title="Show Weekly Pivot")
+WeekSR = input(true, title="Show Weekly Support/Resistance")
+WeekCPR = input(false, title="Show Weekly CPR Range")
+PrevWeekH = input(true, title="Show Previous Week High")
+PrevWeekL = input(true, title="Show Previous Week Low")
+
+plot(WeekPivot and WeekPivotLevel and (timeframe.isintraday or timeframe.isdaily) ? WeekPivotLevel : na, title="WeekPP", color=WeekPP, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(WeekCPR and WeekBCPRlevel and (timeframe.isintraday or timeframe.isdaily) ? WeekBCPRlevel : na, title="WeekBC", color=WeekBC, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(WeekCPR and WeekTCPRlevel and (timeframe.isintraday or timeframe.isdaily) ? WeekTCPRlevel : na, title="WeekTC", color=WeekTC, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(WeekSR and WeekR1level and (timeframe.isintraday or timeframe.isdaily) ? WeekR1level : na, title="WeekR1", color=WeekR1, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(WeekSR and WeekS1level and (timeframe.isintraday or timeframe.isdaily) ? WeekS1level : na, title="WeekS1", color=WeekS1, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(WeekSR and WeekR2level and (timeframe.isintraday or timeframe.isdaily) ? WeekR2level : na, title="WeekR2", color=WeekR2, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(WeekSR and WeekS2level and (timeframe.isintraday or timeframe.isdaily) ? WeekS2level : na, title="WeekS2", color=WeekS2, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(WeekSR and WeekR3level and (timeframe.isintraday or timeframe.isdaily) ? WeekR3level : na, title="WeekR3", color=WeekR3, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(WeekSR and WeekS3level and (timeframe.isintraday or timeframe.isdaily) ? WeekS3level : na, title="WeekS3", color=WeekS3, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(WeekSR and WeekR4level and (timeframe.isintraday or timeframe.isdaily) ? WeekR4level : na, title="WeekR4", color=WeekR4, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(WeekSR and WeekS4level and (timeframe.isintraday or timeframe.isdaily) ? WeekS4level : na, title="WeekS4", color=WeekS4, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(PrevWeekH and PrevWeekHigh and (timeframe.isintraday or timeframe.isdaily) ? PrevWeekHigh : na, title="PrevWeekHigh", color=PrevWHigh, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=40)
+plot(PrevWeekL and PrevWeekLow and (timeframe.isintraday or timeframe.isdaily) ? PrevWeekLow : na, title="PrevWeekLow", color=PrevWLow, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=40)
+
+//Previous Month datas
+PrevMonthClose = getSeries(close[1], 'M')
+PrevMonthOpen = getSeries(open[1], 'M')
+PrevMonthHigh = getSeries(high[1], 'M')
+PrevMonthLow = getSeries(low[1], 'M')
+
+//Month CPR levels
+MonthPivotLevel = (PrevMonthHigh + PrevMonthLow + PrevMonthClose) / 3
+MonthBCPRlevel = (PrevMonthHigh + PrevMonthLow) / 2
+MonthTCPRlevel = (MonthPivotLevel - MonthBCPRlevel) + MonthPivotLevel
+MonthR1level = (2 * MonthPivotLevel) - PrevMonthLow
+MonthS1level = (2 * MonthPivotLevel) - PrevMonthHigh
+MonthR2level = MonthPivotLevel + (PrevMonthHigh - PrevMonthLow)
+MonthS2level = MonthPivotLevel - (PrevMonthHigh - PrevMonthLow)
+MonthR3level = PrevMonthHigh + 2 * (MonthPivotLevel - PrevMonthLow)
+MonthS3level = PrevMonthLow - 2 * (PrevMonthHigh - MonthPivotLevel)
+MonthR4level = MonthR3level + (MonthR2level - MonthR1level)
+MonthS4level = MonthS3level - (MonthS1level - MonthS2level)
+
+//UX Input Arguments
+MonthPP = #ffffff
+MonthBC = #0000FF
+MonthTC = #0000FF
+MonthR1 = #009688
+MonthS1 = #009688
+MonthR2 = #009688
+MonthS2 = #009688
+MonthR3 = #009688
+MonthS3 = #009688
+MonthR4 = #009688
+MonthS4 = #009688
+PrevMHigh = #ffeb3b
+PrevMLow = #ffeb3b
+
+MonthPivot = input(true, title="Show Monthly Pivot")
+MonthSR = input(true, title="Show Monthly Support/Resistance")
+MonthCPR = input(false, title="Show Monthly CPR Range")
+PrevMonthH = input(true, title="Show Previous Month High")
+PrevMonthL = input(true, title="Show Previous Month Low")
+
+plot(MonthPivot and MonthPivotLevel and (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly) ? MonthPivotLevel : na, title="MonthPP", color=MonthPP, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(MonthCPR and MonthBCPRlevel and (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly) ? MonthBCPRlevel : na, title="MonthBC", color=MonthBC, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(MonthCPR and MonthTCPRlevel and (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly) ? MonthTCPRlevel : na, title="MonthTC", color=MonthTC, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(MonthSR and MonthR1level and (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly) ? MonthR1level : na, title="MonthR1", color=MonthR1, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(MonthSR and MonthS1level and (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly) ? MonthS1level : na, title="MonthS1", color=MonthS1, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(MonthSR and MonthR2level and (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly) ? MonthR2level : na, title="MonthR2", color=MonthR2, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(MonthSR and MonthS2level and (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly) ? MonthS2level : na, title="MonthS2", color=MonthS2, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(MonthSR and MonthR3level and (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly) ? MonthR3level : na, title="MonthR3", color=MonthR3, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(MonthSR and MonthS3level and (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly) ? MonthS3level : na, title="MonthS3", color=MonthS3, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(MonthSR and MonthR4level and (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly) ? MonthR4level : na, title="MonthR4", color=MonthR4, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=0)
+plot(MonthSR and MonthS4level and (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly) ? MonthS4level : na, title="MonthS4", color=MonthS4, linewidth=myWidthMainLevels, style=plot.style_circles, transp=0)
+plot(PrevMonthH and PrevMonthHigh and (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly) ? PrevMonthHigh : na, title="PrevMonthHigh", color=PrevMHigh, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=40)
+plot(PrevMonthL and PrevMonthLow and (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly) ? PrevMonthLow : na, title="PrevMonthLow", color=PrevMLow, linewidth=myWidthMainLevels, style=plot.style_circles, offset=0, transp=40)
+
+
+//Tomorrow's Pivot Calculation
+tpr = input(title="Next CPR resolution", defval="D", options=["D", "W", "M", "12M"])
+tpopen = security(syminfo.tickerid, tpr, open, barmerge.gaps_off, barmerge.lookahead_on)
+tphigh = security(syminfo.tickerid, tpr, high, barmerge.gaps_off, barmerge.lookahead_on)
+tplow = security(syminfo.tickerid, tpr, low, barmerge.gaps_off, barmerge.lookahead_on)
+tpclose = security(syminfo.tickerid, tpr, close, barmerge.gaps_off, barmerge.lookahead_on)
+
+tppivot = (tphigh + tplow + tpclose) / 3.0
+tpbc = (tphigh + tplow) / 2.0
+tptc = (tppivot - tpbc) + tppivot
+tpR1level = (2 * tppivot) - tplow
+tpS1level = (2 * tppivot) - tphigh 
+tpR2level = tppivot + (tphigh  - tplow)
+tpS2level = tppivot - (tphigh  - tplow)
+tpR3level = tphigh  + 2 * (tppivot - tplow)
+tpS3level = tplow - 2 * (tphigh  - tppivot)
+tpR4level = tpR3level + (tpR2level - tpR1level)
+tpS4level = tpS3level - (tpS1level - tpS2level)
+
+//UX Input Arguments
+tpPP = color.white
+tpBC = #0000FF
+tpTC = #0000FF
+tpR1 = #67c52e
+tpS1 =#b71c1c
+tpR2 = #67c52e
+tpS2 =#b71c1c
+tpR3 = #67c52e
+tpS3 =#b71c1c
+tpR4 = #67c52e
+tpS4 =#b71c1c
+
+tp = input(false, title="Show Next CPR")
+tpSR = input(false, title="Show Next Support/Resistance")
+myoffset = input(title="Next CPR offset", type=input.integer, defval=75)
+
+plot(tp and tppivot ? tppivot : na, title="NextPP", color=tpPP, linewidth=myWidthMainLevels, style=plot.style_circles, offset = myoffset, transp=0)
+plot(tp and tpbc ? tpbc: na, title="NextBC", color=tpBC, linewidth=myWidthMainLevels, style=plot.style_circles, offset = myoffset, transp=0)
+plot(tp and tptc ? tptc : na, title="NextTC", color=tpTC, linewidth=myWidthMainLevels, style=plot.style_circles, offset = myoffset, transp=0)
+plot(tpSR and tpR1level ? tpR1level : na, title="NextR1", color=tpR1, linewidth=myWidthMainLevels, style=plot.style_circles, offset = myoffset, transp=0)
+plot(tpSR and tpS1level ? tpS1level : na, title="NextS1", color=tpS1, linewidth=myWidthMainLevels, style=plot.style_circles, offset = myoffset, transp=0)
+plot(tpSR and tpR2level ? tpR2level : na, title="NextR2", color=tpR2, linewidth=myWidthMainLevels, style=plot.style_circles, offset = myoffset, transp=0)
+plot(tpSR and tpS2level ? tpS2level : na, title="NextS2", color=tpS2, linewidth=myWidthMainLevels, style=plot.style_circles, offset = myoffset, transp=0)
+plot(tpSR and tpR3level ? tpR3level : na, title="NextR3", color=tpR3, linewidth=myWidthMainLevels, style=plot.style_circles, offset = myoffset, transp=0)
+plot(tpSR and tpS3level ? tpS3level : na, title="NextS3", color=tpS3, linewidth=myWidthMainLevels, style=plot.style_circles, offset = myoffset, transp=0)
+plot(tpSR and tpR4level ? tpR4level : na, title="NextR4", color=tpR4, linewidth=myWidthMainLevels, style=plot.style_circles, offset = myoffset, transp=0)
+plot(tpSR and tpS4level ? tpS4level : na, title="NextS4", color=tpS4, linewidth=myWidthMainLevels, style=plot.style_circles, offset = myoffset, transp=0)
+
+
+
+
+
+
+
+
+
+
+// EMA
+
+
+plot(ema(close, 21), color=#ffffff, linewidth=2, title='21 Day EMA')
+plot(ema(close, 50), color=#f57f17, linewidth=2, title='50 Day EMA')
+plot(ema(close, 200), color=#ff0500, linewidth=2, title='200 Day EMA')
+
+
